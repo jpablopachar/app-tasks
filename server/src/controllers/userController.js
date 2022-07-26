@@ -4,9 +4,11 @@ import { jwtGenerator } from '../helpers/jwt.js'
 import User from '../models/user.js'
 import { createUser, getUser, getUserToken } from '../services/userService.js'
 
-const register = (req, res) => {
+const register = async (req, res) => {
   const { email } = req.body
-  const userExists = getUser(email)
+  const userExists = await getUser(email)
+
+  console.log(userExists)
 
   if (userExists) {
     const error = new Error('Usuario ya registrado')
@@ -19,7 +21,7 @@ const register = (req, res) => {
 
     user.token = generateId()
 
-    createUser(user)
+    await createUser(user)
 
     /* emailRegistration({
       email: user.email,
@@ -35,9 +37,9 @@ const register = (req, res) => {
   }
 }
 
-const authenticate = (req, res) => {
+const authenticate = async (req, res) => {
   const { email, password } = req.body
-  const user = getUser(email)
+  const user = await getUser(email)
 
   if (!user) {
     const error = new Error('El usuario no existe')
@@ -65,9 +67,9 @@ const authenticate = (req, res) => {
   }
 }
 
-const confirm = (req, res) => {
+const confirm = async (req, res) => {
   const { token } = req.params
-  const user = getUserToken(token)
+  const user = await getUserToken(token)
 
   if (!user) {
     const error = new Error('Token no válido')
@@ -79,7 +81,7 @@ const confirm = (req, res) => {
     user.confirmed = true
     user.token = ''
 
-    createUser(user)
+    await createUser(user)
 
     res.json({ msg: 'Usuario confirmado correctamente' })
   } catch (error) {
@@ -87,9 +89,9 @@ const confirm = (req, res) => {
   }
 }
 
-const forgetPassword = (req, res) => {
+const forgetPassword = async (req, res) => {
   const { email } = req.body
-  const user = getUser(email)
+  const user = await getUser(email)
 
   if (!user) {
     const error = new Error('El usuario no existe')
@@ -100,7 +102,7 @@ const forgetPassword = (req, res) => {
   try {
     user.token = generateId()
 
-    createUser(user)
+    await createUser(user)
 
     // Enviar email
 
@@ -110,10 +112,10 @@ const forgetPassword = (req, res) => {
   }
 }
 
-const checkToken = (req, res) => {
+const checkToken = async (req, res) => {
   const { token } = req.params
 
-  const validToken = getUserToken(token)
+  const validToken = await getUserToken(token)
 
   if (!validToken) {
     res.json({ msg: 'Token válido y el usuario existe' })
@@ -124,18 +126,18 @@ const checkToken = (req, res) => {
   }
 }
 
-const newPassword = (req, res) => {
+const newPassword = async (req, res) => {
   const { token } = req.params
   const { password } = req.body
 
-  const user = getUserToken(token)
+  const user = await getUserToken(token)
 
   if (user) {
     user.password = password
     user.token = ''
 
     try {
-      createUser(user)
+      await createUser(user)
 
       res.json({ msg: 'Password modificado correctamente' })
     } catch (error) {

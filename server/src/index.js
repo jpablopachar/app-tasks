@@ -9,9 +9,20 @@ dotenv.config()
 dbConnection()
 
 const app = express()
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 3000
+const whitelist = [process.env.CLIENT]
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log(origin)
+    if (whitelist.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Error de Cors'))
+    }
+  }
+}
 
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(morgan('dev'))
 
