@@ -1,13 +1,54 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import Alert from '../components/Alert'
+import { axiosClient } from '../config/Axios-Client'
 
 const Login = () => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [alert, setAlert] = useState({})
+
+  const navigate = useNavigate()
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    if ([email, password].includes('')) {
+      setAlert({
+        msg: 'Todos los campos son obligatorios',
+        error: true
+      })
+
+      return
+    }
+
+    try {
+      const { data } = await axiosClient.post('/users/login', {
+        email,
+        password
+      })
+
+      setAlert({})
+      localStorage.setItem('token', data.token)
+      navigate('/projects')
+    } catch (error) {
+      setAlert({ msg: error.response.data.msg, error: true })
+    }
+  }
+
+  const { msg } = alert
+
   return (
     <>
       <h1 className="text-sky-600 font-black text-6xl capitalize">
         Inicia sesión y administra tus{' '}
         <span className="text-slate-700">proyectos</span>
       </h1>
-      <form className="my-10 bg-white shadow rounded-lg p-10">
+      {msg && <Alert alert={alert} />}
+      <form
+        className="my-10 bg-white shadow rounded-lg p-10"
+        onSubmit={handleSubmit}
+      >
         <div className="my-5">
           <label
             className="uppercase text-gray-600 block text-xl font-bold"
@@ -20,6 +61,8 @@ const Login = () => {
             type="email"
             placeholder="Email de registro"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
         </div>
         <div className="my-5">
@@ -34,6 +77,8 @@ const Login = () => {
             type="password"
             placeholder="Contraseña de registro"
             className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
           />
         </div>
         <input

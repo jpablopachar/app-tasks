@@ -1,4 +1,4 @@
-// import { emailRegistration } from '../helpers/email.js'
+import { emailForgetPassword, emailRegistration } from '../helpers/email.js'
 import { generateId } from '../helpers/helpers.js'
 import { jwtGenerator } from '../helpers/jwt.js'
 import User from '../models/user.js'
@@ -7,8 +7,6 @@ import { createUser, getUser, getUserToken } from '../services/userService.js'
 const register = async (req, res) => {
   const { email } = req.body
   const userExists = await getUser(email)
-
-  console.log(userExists)
 
   if (userExists) {
     const error = new Error('Usuario ya registrado')
@@ -21,17 +19,19 @@ const register = async (req, res) => {
 
     user.token = generateId()
 
-    await createUser(user)
+    const newUser = await createUser(user)
 
-    /* emailRegistration({
-      email: user.email,
-      name: user.name,
-      token: user.token
-    }) */
+    if (newUser) {
+      emailRegistration({
+        email: user.email,
+        name: user.name,
+        token: user.token
+      })
 
-    res.json({
-      msg: 'Usuario creado correctamente, revisa tu email para confirmar tu cuenta'
-    })
+      res.json({
+        msg: 'Usuario creado correctamente, revisa tu email para confirmar tu cuenta'
+      })
+    }
   } catch (error) {
     console.log(error)
   }
@@ -104,7 +104,11 @@ const forgetPassword = async (req, res) => {
 
     await createUser(user)
 
-    // Enviar email
+    emailForgetPassword({
+      email: user.email,
+      name: user.name,
+      token: user.token
+    })
 
     res.json({ msg: 'Hemos enviado un email con las instrucciones' })
   } catch (error) {
@@ -115,9 +119,13 @@ const forgetPassword = async (req, res) => {
 const checkToken = async (req, res) => {
   const { token } = req.params
 
+  console.log(token)
+
   const validToken = await getUserToken(token)
 
-  if (!validToken) {
+  console.log(validToken)
+
+  if (validToken) {
     res.json({ msg: 'Token válido y el usuario existe' })
   } else {
     const error = new Error('Token no válido')

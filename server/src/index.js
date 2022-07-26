@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 3000
 const whitelist = [process.env.CLIENT]
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log(origin)
     if (whitelist.includes(origin)) {
       callback(null, true)
     } else {

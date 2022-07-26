@@ -13,5 +13,7 @@ export const getUserToken = async (token) => {
 }
 
 export const createUser = async (user) => {
-  await user.save()
+  const newUser = await user.save()
+
+  return newUser
 }
