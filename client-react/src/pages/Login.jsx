@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Alert from '../components/Alert'
 import { axiosClient } from '../config/Axios-Client'
-import useAuth from '../hooks/useAuth'
+import { useAuth } from '../hooks/useAuth'
 
 const Login = () => {
   const [email, setEmail] = useState('')

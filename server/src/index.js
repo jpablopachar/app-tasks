@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
 import dbConnection from './config/db.js'
+import projectRoutes from './routes/projectRouter.js'
 import userRoutes from './routes/userRouter.js'
 
 dotenv.config()
@@ -26,5 +27,6 @@ app.use(express.json())
 app.use(morgan('dev'))
 
 app.use('/api/users', userRoutes)
+app.use('/api/projects', projectRoutes)
 
 app.listen(PORT, () => { console.log(`Server on port: ${PORT}`) })
