@@ -33,7 +33,7 @@ const getProject = async (req, res) => {
     return res.status(401).json({ msg: error.message })
   }
 
-  res.json(project)
+  return res.json(project)
 }
 
 const newProject = async (req, res) => {
@@ -43,7 +43,7 @@ const newProject = async (req, res) => {
 
   const newProject = await createProject(project)
 
-  res.json(newProject)
+  return res.json(newProject)
 }
 
 const editProject = async (req, res) => {

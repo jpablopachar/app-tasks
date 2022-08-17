@@ -6,6 +6,8 @@ import { useAuth } from '../hooks/useAuth'
 const ProtectedRoute = () => {
   const { auth, loading } = useAuth()
 
+  console.log(auth)
+
   if (loading) return 'Cargando...'
 
   return (
@@ -16,10 +18,10 @@ const ProtectedRoute = () => {
           <Header />
           <div className="md:flex md:min-h-screen">
             <Sidebar />
+            <main className="p-10 flex-1">
+              <Outlet />
+            </main>
           </div>
-          <main className="p-10 flex-1">
-            <Outlet />
-          </main>
         </div>
           )
         : (

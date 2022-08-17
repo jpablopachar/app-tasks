@@ -7,9 +7,13 @@ const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({})
   const [loading, setLoading] = useState(true)
 
+  // const navigate = useNavigate()
+
   useEffect(() => {
     const authenticatedUser = async () => {
       const token = localStorage.getItem('token')
+
+      console.log(token)
 
       if (!token) {
         setLoading(false)
@@ -25,7 +29,10 @@ const AuthProvider = ({ children }) => {
           }
         })
 
+        console.log(data)
+
         setAuth(data)
+        // navigate('/projects')
       } catch (error) {
         setAuth({})
       }

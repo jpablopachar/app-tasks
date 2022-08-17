@@ -159,9 +159,10 @@ const newPassword = async (req, res) => {
 }
 
 const profile = (req, res) => {
+  console.log(req.user)
   const { user } = req
 
-  res.json({ user })
+  return res.json(user)
 }
 
 export {
