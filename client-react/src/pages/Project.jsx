@@ -1,25 +1,66 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import io from 'socket.io-client'
 import { useAdmin } from '../hooks/useAdmin'
 import { useProjects } from '../hooks/useProjects'
+
+let socket
 
 const Project = () => {
   const params = useParams()
   const admin = useAdmin()
-  const { getProject, project, loading } = useProjects()
+  const {
+    getProject,
+    project,
+    loading,
+    handleModalTask,
+    // alert,
+    submitTasksProject,
+    deleteTaskProject,
+    updateTaskProject,
+    changeStatusTask
+  } = useProjects()
 
   console.log(params)
 
   useEffect(() => getProject(params.id), [])
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    socket = io(import.meta.env.VITE_API_URL)
+
+    socket.emit('open project', params.id)
+  }, [])
+
+  useEffect(() => {
+    socket.on('new task', (newTask) => {
+      if (newTask.project === project.id) {
+        submitTasksProject(newTask)
+      }
+    })
+
+    socket.on('remove task', (deletedTask) => {
+      if (deletedTask.project === project.id) {
+        deleteTaskProject(deletedTask)
+      }
+    })
+
+    socket.on('edit task', (updatedTask) => {
+      if (updatedTask.project === project.id) {
+        updateTaskProject(updatedTask)
+      }
+    })
+
+    socket.on('change status', (newTaskStatus) => {
+      if (newTaskStatus.project === project.id) {
+        changeStatusTask(newTaskStatus)
+      }
+    })
+  })
 
   const { name } = project
-  // const { msg } = alert;
+  // const { msg } = alert
 
   if (loading) return 'Cargando...'
-
-  console.log('Project')
 
   return (
     <>
@@ -42,7 +83,7 @@ const Project = () => {
               />
             </svg>
             <Link
-              to={`/proyectos/editar/${params.id}`}
+              to={`/projects/edit/${params.id}`}
               className="uppercase font-bold"
             >
               Editar
@@ -52,6 +93,7 @@ const Project = () => {
       </div>
       {admin && (
         <button
+          onClick={handleModalTask}
           type="button"
           className="text-sm px-5 py-3 w-full md:w-auto rounded-lg uppercase font-bold bg-sky-400 text-white text-center mt-5 flex gap-2 items-center justify-center"
         >
@@ -71,22 +113,49 @@ const Project = () => {
         </button>
       )}
       <p className="font-bold text-xl mt-10">Tareas del Proyecto</p>
-      <div className="bg-white shadow mt-10 rounded-lg">
-        <p className="text-center my-5 p-10">No hay tareas en este proyecto</p>
-      </div>
+      {/* <div className="bg-white shadow mt-10 rounded-lg">
+        {project.tasks?.length
+          ? (
+              project.tasks?.map((tarea) => (
+            <Tarea key={tarea._id} tarea={tarea} />
+              ))
+            )
+          : (
+          <p className="text-center my-5 p-10">
+            No hay tareas en este proyecto
+          </p>
+            )}
+      </div> */}
+
       {admin && (
         <>
           <div className="flex items-center justify-between mt-10">
             <p className="font-bold text-xl">Colaboradores</p>
             <Link
-              to={`/proyectos/nuevo-colaborador/${project._id}`}
+              to={`/projects/new-collaborator/${project._id}`}
               className="text-gray-400 hover:text-black uppercase font-bold"
             >
               Añadir
             </Link>
           </div>
+          {/* <div className="bg-white shadow mt-10 rounded-lg">
+            {project.collaborators?.length
+              ? (
+                  proyecto.colaboradores?.map((colaborador) => (
+                <Colaborador key={colaborador._id} colaborador={colaborador} />
+                  ))
+                )
+              : (
+              <p className="text-center my-5 p-10">
+                No hay Colaboradores en este proyecto
+              </p>
+                )}
+          </div> */}
         </>
       )}
+      {/* <ModalFormularioTarea/>
+      <ModalEliminarTarea/>
+      <ModalEliminarColaborador/> */}
     </>
   )
 }
