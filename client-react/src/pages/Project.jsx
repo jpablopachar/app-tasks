@@ -1,6 +1,11 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import io from 'socket.io-client'
+import Collaborator from '../components/Collaborator'
+import ModalDeleteCollaborator from '../components/Modal-Delete-Collaborator'
+import ModalDeleteTask from '../components/Modal-Delete-Task'
+import ModalTaskForm from '../components/Modal-Task-Form'
+import Task from '../components/Task'
 import { useAdmin } from '../hooks/useAdmin'
 import { useProjects } from '../hooks/useProjects'
 
@@ -14,7 +19,6 @@ const Project = () => {
     project,
     loading,
     handleModalTask,
-    // alert,
     submitTasksProject,
     deleteTaskProject,
     updateTaskProject,
@@ -58,7 +62,6 @@ const Project = () => {
   })
 
   const { name } = project
-  // const { msg } = alert
 
   if (loading) return 'Cargando...'
 
@@ -113,20 +116,17 @@ const Project = () => {
         </button>
       )}
       <p className="font-bold text-xl mt-10">Tareas del Proyecto</p>
-      {/* <div className="bg-white shadow mt-10 rounded-lg">
+      <div className="bg-white shadow mt-10 rounded-lg">
         {project.tasks?.length
           ? (
-              project.tasks?.map((tarea) => (
-            <Tarea key={tarea._id} tarea={tarea} />
-              ))
+              project.tasks?.map((task) => <Task key={task._id} task={task} />)
             )
           : (
           <p className="text-center my-5 p-10">
             No hay tareas en este proyecto
           </p>
             )}
-      </div> */}
-
+      </div>
       {admin && (
         <>
           <div className="flex items-center justify-between mt-10">
@@ -138,11 +138,14 @@ const Project = () => {
               Añadir
             </Link>
           </div>
-          {/* <div className="bg-white shadow mt-10 rounded-lg">
+          <div className="bg-white shadow mt-10 rounded-lg">
             {project.collaborators?.length
               ? (
-                  proyecto.colaboradores?.map((colaborador) => (
-                <Colaborador key={colaborador._id} colaborador={colaborador} />
+                  project.collaborators?.map((collaborator) => (
+                <Collaborator
+                  key={collaborator._id}
+                  collaborator={collaborator}
+                />
                   ))
                 )
               : (
@@ -150,12 +153,12 @@ const Project = () => {
                 No hay Colaboradores en este proyecto
               </p>
                 )}
-          </div> */}
+          </div>
         </>
       )}
-      {/* <ModalFormularioTarea/>
-      <ModalEliminarTarea/>
-      <ModalEliminarColaborador/> */}
+      <ModalTaskForm />
+      <ModalDeleteTask />
+      <ModalDeleteCollaborator />
     </>
   )
 }
